@@ -1,0 +1,11 @@
+services:
+  crm-frontend:
+    build:
+      context: .
+    ports:
+      - "3001:80"
+    environment:
+      # host.docker.internal — специальный DNS-адрес, который из контейнера
+      # указывает на localhost хост-машины. Так nginx внутри Docker достучится
+      # до gateway, запущенного на твоей машине через docker-compose gateway-репо.
+      - GATEWAY_URL=http://host.docker.internal:8080

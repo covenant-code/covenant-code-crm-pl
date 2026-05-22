@@ -1,0 +1,42 @@
+services:
+  crm-frontend:
+    image: ${REGISTRY}/${IMAGE_OWNER}/crm-frontend:${FRONTEND_IMAGE_TAG:-latest}
+    environment:
+      # Внутренний адрес gateway в Swarm overlay-сети.
+      # cccrm_crm-gateway — формат: {имя_стека}_{имя_сервиса}.
+      # nginx (в отличие от Java) нормально работает с _ в именах хостов.
+      - GATEWAY_URL=http://cccrm_crm-gateway:8080
+    networks:
+      - crm-network
+    ports:
+      - target: 80
+        published: 80
+        mode: host
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        order: start-first       # сначала поднять новый, потом убить старый (zero-downtime)
+        failure_action: rollback
+        monitor: 60s
+      rollback_config:
+        parallelism: 1
+        order: stop-first
+        failure_action: pause
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 64M            # nginx со статикой требует очень мало памяти
+        reservations:
+          cpus: '0.10'
+          memory: 32M
+
+networks:
+  # Подключаемся к уже существующей overlay-сети стека cccrm (gateway + service).
+  # external: true означает "не создавать, а использовать существующую".
+  crm-network:
+    external: true
+    name: cccrm_crm-network

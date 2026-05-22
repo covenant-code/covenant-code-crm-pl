@@ -1,0 +1,162 @@
+/*
+  Design Tokens — CRM Bootcamp
+  Source: согласованный референс CRM.jpeg
+
+  Подключаем кастомные переменные в Tailwind v4 через @theme.
+  После этого Tailwind автоматически генерирует утилити-классы:
+    bg-background, bg-card, text-primary, border-subtle и т.д.
+*/
+
+@theme {
+  /* ─── Фоны ─────────────────────────────────────────────── */
+  --color-background:   #0d1423;   /* Основной фон страницы       */
+  --color-surface:      #162032;   /* Фон карточек и панелей      */
+  --color-surface-elevated: #1a2744; /* Фон сайдбара / поднятые карточки */
+  --color-surface-hover: #1e2f50;  /* Hover-состояние карточек    */
+
+  /* ─── Границы ──────────────────────────────────────────── */
+  --color-border:       #1e2d45;   /* Стандартная граница         */
+  --color-border-subtle: rgba(255,255,255,0.05); /* Едва заметная граница */
+
+  /* ─── Текст ────────────────────────────────────────────── */
+  --color-text-primary:   #ffffff;   /* Основной текст              */
+  --color-text-secondary: #8096b0;   /* Вторичный / подписи         */
+  --color-text-muted:     #4a607a;   /* Неактивные элементы         */
+  --color-text-inverse:   #0d1423;   /* Текст на светлых акцентах   */
+
+  /* ─── Акцентные цвета ──────────────────────────────────── */
+  --color-primary:      #1677ff;   /* Основной синий (активные элементы, кнопки) */
+  --color-primary-bg:   rgba(22, 119, 255, 0.15); /* Фон синих бейджей / выделений */
+
+  --color-orange:       #fa8c16;   /* Оранжевый — Fees, акценты   */
+  --color-orange-bg:    rgba(250, 140, 22, 0.15);
+
+  --color-green:        #52c41a;   /* Зелёный — рост, успех       */
+  --color-green-bg:     rgba(82, 196, 26, 0.15);
+
+  --color-red:          #ff4d4f;   /* Красный — ошибки, спад      */
+  --color-red-bg:       rgba(255, 77, 79, 0.15);
+
+  --color-purple:       #7c3aed;   /* Фиолетовый — Social, метки  */
+  --color-purple-bg:    rgba(124, 58, 237, 0.15);
+
+  --color-teal:         #13c2c2;   /* Бирюзовый — Computer Science, Civil */
+  --color-teal-bg:      rgba(19, 194, 194, 0.15);
+
+  --color-yellow:       #faad14;   /* Жёлтый — Statistics, предупреждения */
+  --color-yellow-bg:    rgba(250, 173, 20, 0.15);
+
+  /* ─── Семантические статусы ────────────────────────────── */
+  --color-success:      #52c41a;
+  --color-warning:      #faad14;
+  --color-error:        #ff4d4f;
+  --color-info:         #1677ff;
+
+  /* ─── Типографика ──────────────────────────────────────── */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --font-size-xs:   0.75rem;    /* 12px — подписи, метки        */
+  --font-size-sm:   0.875rem;   /* 14px — вторичный текст       */
+  --font-size-base: 1rem;       /* 16px — основной текст        */
+  --font-size-lg:   1.125rem;   /* 18px — заголовки карточек    */
+  --font-size-xl:   1.5rem;     /* 24px — крупные числа виджетов */
+  --font-size-2xl:  2rem;       /* 32px — главные показатели    */
+
+  /* ─── Скругления ───────────────────────────────────────── */
+  --radius-sm:  4px;    /* Бейджи, теги                  */
+  --radius-md:  8px;    /* Кнопки, инпуты                */
+  --radius-lg:  12px;   /* Карточки                      */
+  --radius-xl:  16px;   /* Большие панели                */
+  --radius-full: 9999px; /* Аватары, круглые кнопки       */
+
+  /* ─── Тени ─────────────────────────────────────────────── */
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+  /* ─── Отступы (spacing уже есть в Tailwind, кастомные добавляем при необходимости) */
+  --sidebar-width: 200px;
+  --header-height: 56px;
+}
+
+/* ─── Базовые стили страницы ─────────────────────────────────── */
+@layer base {
+  html, body, #root {
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+  }
+
+  /* Кастомный скроллбар в стиле тёмной темы */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-surface);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-muted);
+  }
+}
+
+/* ─── Переопределение стилей Ant Design под нашу тёмную тему ─── */
+@layer components {
+  /* Ant Design использует CSS переменные antd — перебиваем их нашими токенами */
+  .ant-layout {
+    background: var(--color-background) !important;
+  }
+  .ant-layout-sider {
+    background: var(--color-surface-elevated) !important;
+  }
+  .ant-layout-header {
+    background: var(--color-surface) !important;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .ant-layout-content {
+    background: transparent !important;
+  }
+  .ant-menu.ant-menu-dark {
+    background: var(--color-surface-elevated) !important;
+  }
+  .ant-card {
+    background: var(--color-surface) !important;
+    border-color: var(--color-border) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-card) !important;
+  }
+  .ant-card .ant-card-head {
+    background: transparent !important;
+    border-bottom-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+  }
+  .ant-card .ant-card-body {
+    color: var(--color-text-primary) !important;
+  }
+  .ant-table {
+    background: var(--color-surface) !important;
+    color: var(--color-text-primary) !important;
+  }
+  .ant-table-thead > tr > th {
+    background: var(--color-surface-elevated) !important;
+    color: var(--color-text-secondary) !important;
+    border-bottom-color: var(--color-border) !important;
+  }
+  .ant-table-tbody > tr > td {
+    border-bottom-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+  }
+  .ant-table-tbody > tr:hover > td {
+    background: var(--color-surface-hover) !important;
+  }
+  .ant-statistic-title {
+    color: var(--color-text-secondary) !important;
+  }
+  .ant-statistic-content {
+    color: var(--color-text-primary) !important;
+  }
+}

@@ -1,0 +1,64 @@
+server {
+    listen 80;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Gzip-сжатие — уменьшает размер JS/CSS примерно в 3-4 раза
+    gzip on;
+    gzip_vary on;
+    gzip_types
+        text/plain
+        text/css
+        application/javascript
+        application/json
+        image/svg+xml;
+    gzip_min_length 1024;
+
+    # ── API-прокси → gateway ─────────────────────────────────────────────────
+    # Браузер шлёт GET /api/v1/students → nginx → http://cccrm_crm-gateway:8080/api/v1/students
+    # Это устраняет CORS полностью: браузер видит только один хост (nginx).
+    # ${GATEWAY_URL} подставляется из переменной окружения при старте контейнера.
+    location /api/ {
+        proxy_pass ${GATEWAY_URL};
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+        proxy_connect_timeout 10s;
+    }
+
+    # Swagger UI — проксируем на gateway (полезно для staging/разработки)
+    location /swagger-ui/ {
+        proxy_pass ${GATEWAY_URL};
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+    }
+    location /api-docs/ {
+        proxy_pass ${GATEWAY_URL};
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+    }
+
+    # ── Статические ресурсы ──────────────────────────────────────────────────
+    # Vite добавляет хэш в имя файла (main-Abc123.js) — такие файлы можно
+    # кэшировать на 1 год: если код изменится, имя файла тоже изменится.
+    location ~* \.(js|css|woff2?|ttf|eot|ico|png|jpg|jpeg|gif|svg|webp)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # ── React SPA (главное правило) ───────────────────────────────────────────
+    # try_files $uri — ищет файл (например /favicon.ico)
+    # $uri/ — ищет директорию
+    # /index.html — если ничего не нашёл, отдаёт index.html
+    # Это нужно для React Router: /students/42 — не реальный файл, а маршрут React.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Скрываем версию nginx из заголовков ответа (security best practice)
+    server_tokens off;
+}
