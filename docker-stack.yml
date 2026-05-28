@@ -1,6 +1,6 @@
 services:
   crm-frontend:
-    image: ${REGISTRY}/${IMAGE_OWNER}/crm-frontend:${FRONTEND_IMAGE_TAG:-latest}
+    image: ${REGISTRY}/crm-frontend:${FRONTEND_IMAGE_TAG:-latest}
     environment:
       # Внутренний адрес gateway в Swarm overlay-сети.
       # cccrm_crm-gateway — формат: {имя_стека}_{имя_сервиса}.

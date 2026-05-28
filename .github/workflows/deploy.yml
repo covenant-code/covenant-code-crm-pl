@@ -88,7 +88,6 @@ jobs:
             NEW_IMAGE="$REGISTRY/${{ env.IMAGE_NAME }}:$FRONTEND_IMAGE_TAG"
 
             export REGISTRY
-            export IMAGE_OWNER="${{ github.repository_owner }}"
             export FRONTEND_IMAGE_TAG
 
             echo "==> Logging in to registry on server"
@@ -105,14 +104,17 @@ jobs:
             ELAPSED=0
 
             while [ "$ELAPSED" -lt "$MAX_WAIT" ]; do
-              REPLICAS=$(docker service ls --filter "name=$SERVICE" --format "{{.Replicas}}" 2>/dev/null || echo "0/0")
-              RUNNING=$(echo "$REPLICAS" | cut -d'/' -f1)
-              DESIRED=$(echo "$REPLICAS" | cut -d'/' -f2)
+              REPLICAS=$(docker service ls --filter "name=$SERVICE" --format "{{.Replicas}}" 2>/dev/null | head -1)
+              REPLICAS="${REPLICAS:-0/0}"
+              RUNNING=$(echo "$REPLICAS" | cut -d'/' -f1 | tr -d '[:space:]')
+              DESIRED=$(echo "$REPLICAS" | cut -d'/' -f2 | tr -d '[:space:]')
 
               set +o pipefail
               TASK_STATES=$(docker service ps "$SERVICE" --no-trunc \
                 --format "{{.Image}} {{.CurrentState}}" 2>/dev/null || true)
-              FAILED=$(echo "$TASK_STATES" | grep -F "$FRONTEND_IMAGE_TAG" | grep -cE "Failed|Rejected" || echo 0)
+              FAILED=$(echo "$TASK_STATES" | grep -F "$FRONTEND_IMAGE_TAG" | grep -cE "Failed|Rejected" 2>/dev/null || echo "0")
+              FAILED=$(echo "$FAILED" | head -1 | tr -d '[:space:]')
+              FAILED="${FAILED:-0}"
               set -o pipefail
 
               echo "  [${ELAPSED}s] Replicas: $REPLICAS | Failed new tasks: $FAILED"
@@ -123,7 +125,7 @@ jobs:
                 exit 1
               fi
 
-              if [ "$DESIRED" -gt 0 ] && [ "$RUNNING" = "$DESIRED" ]; then
+              if [ -n "$DESIRED" ] && [ "$DESIRED" -gt 0 ] && [ "$RUNNING" = "$DESIRED" ]; then
                 SPEC_IMAGE=$(docker service inspect "$SERVICE" \
                   --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}' 2>/dev/null || echo "")
                 if echo "$SPEC_IMAGE" | grep -q "$FRONTEND_IMAGE_TAG"; then

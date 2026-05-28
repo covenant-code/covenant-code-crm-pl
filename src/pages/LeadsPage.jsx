@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import {
   Table, Button, Modal, Drawer, Form, Input, Select,
-  Popconfirm, message, Space, Tag, Tooltip, Divider,
+  message, Space, Tooltip, Divider,
   List, Typography, Empty,
 } from 'antd'
 import {
@@ -10,10 +10,8 @@ import {
 } from '@ant-design/icons'
 import { leadsApi }    from '../api/leads'
 import { coursesApi }  from '../api/courses'
-import { studentsApi } from '../api/students'
 import { PageHeader }  from '../components/common/PageHeader'
 import { StatusBadge } from '../components/common/StatusBadge'
-import { showNotImplemented } from '../components/common/NotImplementedModal'
 import { useAuth }     from '../hooks/useAuth'
 import { canManageContent } from '../utils/roles'
 import { getErrorMessage, parseProblemDetail } from '../utils/errors'
@@ -72,6 +70,7 @@ export default function LeadsPage() {
     }
   }, [filterStatus])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load() }, [load])
 
   function openCreate() {
