@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import {
   Table, Button, Modal, Form, Input, Select, DatePicker,
-  Popconfirm, message, Space, Tooltip, Tag,
+  Popconfirm, message, Space, Tooltip,
 } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined, FilterOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
@@ -61,6 +61,7 @@ export default function LessonsPage() {
     }
   }, [filterGroup, auth])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load() }, [load])
 
   function openCreate() {

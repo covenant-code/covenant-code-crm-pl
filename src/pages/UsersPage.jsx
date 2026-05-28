@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Table, Button, Switch, message, Space, Tag, Typography, Avatar } from 'antd'
+import { Table, Switch, message, Tag, Typography, Avatar } from 'antd'
 import { usersApi }    from '../api/users'
 import { PageHeader }  from '../components/common/PageHeader'
 import { ROLE_LABELS, ROLE_COLORS } from '../utils/roles'
@@ -23,6 +23,7 @@ export default function UsersPage() {
     }
   }, [])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load() }, [load])
 
   async function toggleEnabled(user) {

@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Card, Col, Row, Statistic, Spin } from 'antd'
+import { Card, Col, Row, Statistic } from 'antd'
 import {
   TeamOutlined,
   BookOutlined,
   UserAddOutlined,
   UsergroupAddOutlined,
   CalendarOutlined,
-  ArrowUpOutlined,
 } from '@ant-design/icons'
 import { studentsApi } from '../api/students'
 import { coursesApi }  from '../api/courses'

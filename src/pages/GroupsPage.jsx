@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import {
   Table, Button, Modal, Drawer, Form, Input, Select,
   Popconfirm, message, Space, Tooltip, List, Avatar,
-  Typography, Empty, Tag,
+  Typography, Empty,
 } from 'antd'
 import {
   PlusOutlined, EditOutlined, TeamOutlined, UserDeleteOutlined,
@@ -60,6 +60,7 @@ export default function GroupsPage() {
     }
   }, [])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load() }, [load])
 
   function openCreate() {
