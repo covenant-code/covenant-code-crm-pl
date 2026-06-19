@@ -16,7 +16,7 @@ services:
       replicas: 1
       update_config:
         parallelism: 1
-        order: start-first       # сначала поднять новый, потом убить старый (zero-downtime)
+        order: stop-first        # host-mode порты нельзя занимать двумя контейнерами одновременно
         failure_action: rollback
         monitor: 60s
       rollback_config:
