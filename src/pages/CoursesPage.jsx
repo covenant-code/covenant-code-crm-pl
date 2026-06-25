@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import {
   Table, Button, Modal, Form, Input, InputNumber,
-  Popconfirm, message, Space, Typography,
+  Popconfirm, message, Space, Typography, Select,
 } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { coursesApi } from '../api/courses'
@@ -80,13 +80,20 @@ export default function CoursesPage() {
   }
 
   const columns = [
-    { title: 'Название', dataIndex: 'name', key: 'name', ellipsis: true },
+    { title: 'Название', dataIndex: 'title', key: 'title', ellipsis: true },
     {
-      title: 'Длительность (ч)',
-      dataIndex: 'durationHours',
-      key: 'durationHours',
-      width: 160,
+      title: 'Длительность (нед.)',
+      dataIndex: 'durationInWeeks',
+      key: 'durationInWeeks',
+      width: 180,
       render: (v) => v ?? '—',
+    },
+    {
+      title: 'Цена (₽)',
+      dataIndex: 'price',
+      key: 'price',
+      width: 120,
+      render: (v) => v != null ? Number(v).toLocaleString('ru-RU') : '—',
     },
     {
       title: 'Описание',
@@ -156,13 +163,30 @@ export default function CoursesPage() {
         <Form form={form} layout="vertical" className="mt-4">
           <Form.Item
             label="Название"
-            name="name"
+            name="title"
             rules={[{ required: true, message: 'Введите название курса' }]}
           >
             <Input placeholder="Python для начинающих" />
           </Form.Item>
-          <Form.Item label="Длительность (часов)" name="durationHours">
-            <InputNumber min={1} max={1000} style={{ width: '100%' }} />
+          <Form.Item
+            label="Длительность (недель)"
+            name="durationInWeeks"
+            rules={[{ required: true, message: 'Укажите длительность' }]}
+          >
+            <InputNumber min={1} max={200} style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item
+            label="Цена (₽)"
+            name="price"
+            rules={[{ required: true, message: 'Укажите цену (0 для бесплатных)' }]}
+          >
+            <InputNumber min={0} step={500} style={{ width: '100%' }} placeholder="0" />
+          </Form.Item>
+          <Form.Item label="Статус" name="status" initialValue="ACTIVE">
+            <Select>
+              <Select.Option value="ACTIVE">Активный</Select.Option>
+              <Select.Option value="ARCHIVED">Архивный</Select.Option>
+            </Select>
           </Form.Item>
           <Form.Item label="Описание" name="description">
             <TextArea rows={3} placeholder="Краткое описание курса" />
