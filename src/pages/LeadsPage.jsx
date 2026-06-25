@@ -28,6 +28,11 @@ const STATUSES = [
   { value: 'REJECTED',             label: 'Отказ' },
 ]
 
+const STATUS_FILTER_OPTIONS = [
+  { value: '', label: 'Все статусы' },
+  ...STATUSES,
+]
+
 export default function LeadsPage() {
   const { auth }                        = useAuth()
   const canEdit                         = canManageContent(auth?.role)
@@ -239,12 +244,10 @@ export default function LeadsPage() {
         extra={
           <Space>
             <Select
-              placeholder="Все статусы"
-              allowClear
               style={{ width: 180 }}
-              options={STATUSES}
-              value={filterStatus}
-              onChange={setFilterStatus}
+              options={STATUS_FILTER_OPTIONS}
+              value={filterStatus ?? ''}
+              onChange={(v) => setFilterStatus(v || null)}
               suffixIcon={<FilterOutlined />}
             />
             {canEdit && (
