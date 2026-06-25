@@ -21,11 +21,11 @@ const { TextArea } = Input
 const { Text }     = Typography
 
 const STATUSES = [
-  { value: 'NEW',            label: 'Новый' },
-  { value: 'CONTACTED',     label: 'Контакт' },
-  { value: 'INTERESTED',    label: 'Заинтересован' },
-  { value: 'NOT_INTERESTED', label: 'Не заинтересован' },
-  { value: 'CONVERTED',     label: 'Конвертирован' },
+  { value: 'NEW',                  label: 'Новый' },
+  { value: 'IN_PROGRESS',          label: 'В работе' },
+  { value: 'CONTACTED',            label: 'Контакт' },
+  { value: 'CONVERTED_TO_STUDENT', label: 'Конвертирован' },
+  { value: 'REJECTED',             label: 'Отказ' },
 ]
 
 export default function LeadsPage() {
@@ -83,7 +83,10 @@ export default function LeadsPage() {
   function openEdit(record) {
     setEditing(record)
     setFormErrors({})
-    form.setFieldsValue(record)
+    form.setFieldsValue({
+      ...record,
+      interestedCourseId: record.interestedCourse?.id ?? null,
+    })
     setModalOpen(true)
   }
 
@@ -149,7 +152,12 @@ export default function LeadsPage() {
 
   function openConvert(lead) {
     setConvertLead(lead)
-    convertForm.resetFields()
+    convertForm.setFieldsValue({
+      firstName: lead.firstName ?? '',
+      lastName:  lead.lastName  ?? '',
+      phone:     lead.phone     ?? '',
+      email:     lead.email     ?? '',
+    })
     setConvertOpen(true)
   }
 
@@ -196,9 +204,8 @@ export default function LeadsPage() {
     },
     {
       title: 'Курс',
-      dataIndex: 'courseId',
-      key: 'courseId',
-      render: (id) => courses.find(c => c.id === id)?.name ?? '—',
+      key: 'interestedCourse',
+      render: (_, record) => record.interestedCourse?.title ?? '—',
     },
     {
       title: '',
@@ -307,11 +314,11 @@ export default function LeadsPage() {
           >
             <Input placeholder="+7 999 123-45-67" />
           </Form.Item>
-          <Form.Item label="Интересующий курс" name="courseId">
+          <Form.Item label="Интересующий курс" name="interestedCourseId">
             <Select
               placeholder="Выберите курс"
               allowClear
-              options={courses.map(c => ({ value: c.id, label: c.name }))}
+              options={courses.map(c => ({ value: c.id, label: c.title }))}
             />
           </Form.Item>
           <Form.Item label="Источник" name="source">
@@ -376,17 +383,41 @@ export default function LeadsPage() {
         cancelText="Отмена"
         confirmLoading={converting}
         destroyOnClose
+        width={480}
       >
         <p className="text-text-secondary mb-4">
-          Лид будет переведён в статус «Конвертирован» и создана запись студента.
+          Проверьте данные студента и подтвердите конвертацию. Лид получит статус «Конвертирован».
         </p>
         <Form form={convertForm} layout="vertical">
-          <Form.Item label="Курс" name="courseId">
-            <Select
-              placeholder="Выберите курс"
-              allowClear
-              options={courses.map(c => ({ value: c.id, label: c.name }))}
-            />
+          <div className="grid grid-cols-2 gap-x-4">
+            <Form.Item
+              label="Имя"
+              name="firstName"
+              rules={[{ required: true, message: 'Введите имя' }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="Фамилия"
+              name="lastName"
+              rules={[{ required: true, message: 'Введите фамилию' }]}
+            >
+              <Input />
+            </Form.Item>
+          </div>
+          <Form.Item
+            label="Телефон"
+            name="phone"
+            rules={[{ required: true, message: 'Введите телефон' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[{ type: 'email', message: 'Некорректный email' }]}
+          >
+            <Input />
           </Form.Item>
         </Form>
       </Modal>
