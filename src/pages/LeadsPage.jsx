@@ -350,7 +350,7 @@ export default function LeadsPage() {
               <List.Item style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
                 <Text>{c.text}</Text>
                 <Text type="secondary" style={{ fontSize: 12 }}>
-                  {c.authorName ?? c.author ?? ''} · {c.createdAt ? formatDateTime(c.createdAt) : ''}
+                  {c.author ? `${c.author.firstName} ${c.author.lastName}` : (c.authorName ?? '')} · {c.createdAt ? formatDateTime(c.createdAt) : ''}
                 </Text>
               </List.Item>
             )}
