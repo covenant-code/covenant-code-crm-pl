@@ -13,7 +13,7 @@ services:
         published: 80
         mode: host
     configs:
-      - source: nginx_default_template_v2
+      - source: nginx_default_template_v3
         target: /etc/nginx/templates/default.conf.template
     deploy:
       replicas: 1
@@ -46,6 +46,6 @@ networks:
 
 configs:
   # Docker configs неизменяемы после создания — при следующей правке шаблона
-  # переименовать в nginx_default_template_v3 и обновить source выше.
-  nginx_default_template_v2:
+  # переименовать в nginx_default_template_v4 и обновить source выше.
+  nginx_default_template_v3:
     file: ./nginx.conf.template
