@@ -14,12 +14,19 @@ server {
         image/svg+xml;
     gzip_min_length 1024;
 
+    # Резолвер Docker'а — нужен, чтобы nginx мог переспрашивать DNS для
+    # $gateway_upstream ниже, а не резолвить хост один раз при старте.
+    # Без этого при рестарте контейнера (например, после ребута хоста)
+    # nginx падает намертво, если gateway ещё не поднялся в этот момент.
+    resolver 127.0.0.11 valid=10s;
+    set $gateway_upstream ${GATEWAY_URL};
+
     # ── API-прокси → gateway ─────────────────────────────────────────────────
     # Браузер шлёт GET /api/v1/students → nginx → http://cccrm_crm-gateway:8080/api/v1/students
     # Это устраняет CORS полностью: браузер видит только один хост (nginx).
     # ${GATEWAY_URL} подставляется из переменной окружения при старте контейнера.
     location /api/ {
-        proxy_pass ${GATEWAY_URL};
+        proxy_pass $gateway_upstream;
         proxy_http_version 1.1;
         proxy_set_header Host              $host;
         proxy_set_header X-Real-IP         $remote_addr;
@@ -32,17 +39,17 @@ server {
     # Swagger UI — ^~ даёт приоритет над regex-правилом для .js/.css ниже,
     # иначе swagger-initializer.js перехватывается как статический файл и отдаёт 404.
     location ^~ /swagger-ui/ {
-        proxy_pass ${GATEWAY_URL};
+        proxy_pass $gateway_upstream;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
     }
     location ^~ /api-docs {
-        proxy_pass ${GATEWAY_URL};
+        proxy_pass $gateway_upstream;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
     }
     location ^~ /v3/api-docs {
-        proxy_pass ${GATEWAY_URL};
+        proxy_pass $gateway_upstream;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
     }

@@ -12,6 +12,9 @@ services:
       - target: 80
         published: 80
         mode: host
+    configs:
+      - source: nginx_default_template_v2
+        target: /etc/nginx/templates/default.conf.template
     deploy:
       replicas: 1
       update_config:
@@ -40,3 +43,9 @@ networks:
   crm-network:
     external: true
     name: cccrm_crm-network
+
+configs:
+  # Docker configs неизменяемы после создания — при следующей правке шаблона
+  # переименовать в nginx_default_template_v3 и обновить source выше.
+  nginx_default_template_v2:
+    file: ./nginx.conf.template
